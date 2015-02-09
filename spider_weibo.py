@@ -9,7 +9,6 @@ import urllib2
 import rsa
 import json
 import binascii
-import random
 import time
 from bs4 import BeautifulSoup
 from weibo_user import *
@@ -233,7 +232,7 @@ class WEIBO:
 
 
 if __name__ == "__main__":
-    fout = open("user.result", "w")
+    fout = open("user.profile", "w")
     ffail = open("user.id.fail", "w")
     fsuccess = open("user.id.success", "w")
     account_list = [("fanko24@qq.com", "fanofkobe"), ("18801309094", "fanofkobe"), ("8137125@qq.com", "fanofkobe"), ("2949948008@qq.com", "fanofkobe"), ("fanko23@qq.com", "fanofkobe")]
@@ -242,18 +241,21 @@ if __name__ == "__main__":
     id_list = [u"1290899453"]
     count = 0
     weibo = None
+    account_id = 0
     while id_list:
-        if count % 15 == 0:
-            number = random.randint(0, len(account_list)-1)
-            user = account_list[number][0]
-            password = account_list[number][1]
-            weibo = WEIBO(user, password)
-
         uid = id_list[0]
         if uid in already_dict:
+            id_list = id_list[1:]
             continue
         already_dict[uid] = 1
-        day = time.strftime("%Y-%m-%d %H:%M:%d", time.localtime())
+
+        if count % 30 == 0:
+            user = account_list[account_id][0]
+            password = account_list[account_id][1]
+            weibo = WEIBO(user, password)
+            account_id = (account_id + 1)%len(account_list)
+
+        day = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         try:
             user = weibo.compute_user(uid)
             fsuccess.write("%s\t%s\n" %(uid, day))
