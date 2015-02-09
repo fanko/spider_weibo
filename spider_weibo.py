@@ -233,11 +233,13 @@ class WEIBO:
 
 
 if __name__ == "__main__":
-    fout = open("weibo_user.txt", "w")
+    fout = open("user.result", "w")
+    ffail = open("user.id.fail", "w")
+    fsuccess = open("user.id.success", "w")
     account_list = [("fanko24@qq.com", "fanofkobe"), ("18801309094", "fanofkobe"), ("8137125@qq.com", "fanofkobe"), ("2949948008@qq.com", "fanofkobe"), ("fanko23@qq.com", "fanofkobe")]
 
     already_dict = {}
-    id_list = [u"1677765873", u"1458925307"]
+    id_list = [u"1290899453"]
     count = 0
     weibo = None
     while id_list:
@@ -251,14 +253,22 @@ if __name__ == "__main__":
         if uid in already_dict:
             continue
         already_dict[uid] = 1
-        user = weibo.compute_user(uid)
-        json_str = user.json_dump()
         day = time.strftime("%Y-%m-%d %H:%M:%d", time.localtime())
-        fout.write("%s\t%s\t%s\n" %(user.uid, json_str, day))
+        try:
+            user = weibo.compute_user(uid)
+            fsuccess.write("%s\t%s\n" %(uid, day))
+            fsuccess.flush()
+        except:
+            ffail.write("%s\t%s\n" %(uid, day))
+            ffail.flush()
+        json_str = user.json_dump()
+        fout.write("%s\t%s\t%s\n" %(uid, day, json_str))
+        fout.flush()
         id_list.extend(user.fans_list)
         id_list.extend(user.follows_list)
         id_list = id_list[1:]
         count += 1
-        time.sleep(2)
-        #break
+        time.sleep(5)
     fout.close()
+    ffail.close()
+    fsuccess.close()
