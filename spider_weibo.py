@@ -64,6 +64,7 @@ class WEIBO:
         pre_login_url = 'http://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.4.5)'
         self.session = requests.Session()
         response = self.session.post(pre_login_url, data=postdata)
+        time.sleep(1)
         login_url = re.findall('replace\(\'(.*)\'\)',response.content)[0]
 
         # get the personal login url and retcode
@@ -73,6 +74,7 @@ class WEIBO:
 
         # login
         respo = self.session.get(login_url)
+        time.sleep(1)
         self.uid = re.findall('"uniqueid":"(\d+)",',respo.content)[0]
         return 0
 
@@ -83,6 +85,7 @@ class WEIBO:
         url_prelogin = 'http://login.sina.com.cn/sso/prelogin.php?entry=weibo&callback=sinaSSOController.preloginCallBack&su=&rsakt=mod&client=ssologin.js(v1.4.5)&_=1364875106625'
         self.session = requests.Session()
         response = self.session.get(url_prelogin)
+        time.sleep(1)
 
         #get the login parameter servertime, nonce, pubkey, rsakv
         json_data = re.search('\((.*)\)', response.content).group(1)
@@ -99,6 +102,7 @@ class WEIBO:
         user = WEIBO_USER()
         url = "http://weibo.com/u/"+uid
         response = self.session.get(url)
+        time.sleep(1)
 
         # page id
         pid = re.findall("CONFIG\['page_id'\]='(.*)'; " ,response.content)
@@ -144,6 +148,7 @@ class WEIBO:
     def compute_info(self, user):
         info_url = "http://weibo.com/p/%s/info" %user.pid
         response = self.session.get(info_url)
+        time.sleep(1)
         soup = BeautifulSoup(response.content)
         script = soup.find_all("script")
         for item in script:
@@ -203,6 +208,7 @@ class WEIBO:
         for i in range(1, page+1):
             fans_url = "http://weibo.com/p/%s/follow?relate=fans&page=%d" %(user.pid, i)
             response = self.session.get(fans_url)
+            time.sleep(1)
             soup = BeautifulSoup(response.content)
             script = soup.find_all("script")
             for item in script:
@@ -220,6 +226,7 @@ class WEIBO:
         for i in range(1, page+1):
             follow_url = "http://weibo.com/p/%s/follow?page=%d" %(user.pid, i)
             response = self.session.get(follow_url)
+            time.sleep(1)
             soup = BeautifulSoup(response.content)
             script = soup.find_all("script")
             for item in script:
@@ -241,6 +248,7 @@ if __name__ == "__main__":
     id_list = [u"1290899453"]
     count = 0
     weibo = None
+    user = None
     account_id = 0
     while id_list:
         uid = id_list[0]
@@ -249,10 +257,10 @@ if __name__ == "__main__":
             continue
         already_dict[uid] = 1
 
-        if count % 30 == 0:
-            user = account_list[account_id][0]
+        if count % 10 == 0:
+            username = account_list[account_id][0]
             password = account_list[account_id][1]
-            weibo = WEIBO(user, password)
+            weibo = WEIBO(username, password)
             account_id = (account_id + 1)%len(account_list)
 
         day = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -270,7 +278,7 @@ if __name__ == "__main__":
         id_list.extend(user.follows_list)
         id_list = id_list[1:]
         count += 1
-        time.sleep(5)
+        time.sleep(1)
     fout.close()
     ffail.close()
     fsuccess.close()
