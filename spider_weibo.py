@@ -97,6 +97,14 @@ class WEIBO:
         return servertime, nonce, pubkey, rsakv
 
 
+    # 退出登录
+    def exit(self):
+        url = "http://weibo.com/logout.php?backurl=%2F"
+        response = self.session.get(url)
+        time.sleep(1)
+        return 0
+
+
     # 计算每个uid的基本信息
     def compute_user(self, uid):
         user = WEIBO_USER()
@@ -242,7 +250,7 @@ if __name__ == "__main__":
     fout = open("user.profile", "w")
     ffail = open("user.id.fail", "w")
     fsuccess = open("user.id.success", "w")
-    account_list = [("fanko24@qq.com", "fanofkobe"), ("18801309094", "fanofkobe"), ("8137125@qq.com", "fanofkobe"), ("2949948008@qq.com", "fanofkobe"), ("fanko23@qq.com", "fanofkobe")]
+    account_list = [("fanko24@qq.com", "fanofkobe"), ("8137125@qq.com", "fanofkobe"), ("2949948008@qq.com", "fanofkobe"), ("fanko23@qq.com", "fanofkobe")]
 
     already_dict = {}
     id_list = [u"1290899453"]
@@ -257,7 +265,9 @@ if __name__ == "__main__":
             continue
         already_dict[uid] = 1
 
-        if count % 10 == 0:
+        if count % 100 == 0:
+            if not weibo:
+                weibo.exit()
             username = account_list[account_id][0]
             password = account_list[account_id][1]
             weibo = WEIBO(username, password)
