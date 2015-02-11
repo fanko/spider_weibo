@@ -266,7 +266,7 @@ if __name__ == "__main__":
         already_dict[uid] = 1
 
         if count % 20 == 0:
-            if not weibo:
+            if weibo:
                 weibo.exit()
             username = account_list[account_id][0]
             password = account_list[account_id][1]
